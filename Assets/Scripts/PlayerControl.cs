@@ -17,12 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float mouseSensitivity = 100f;
 
     [Header("Interacción (Raycast)")]
-    [SerializeField] private float raycastDistance = 3f; 
+    [SerializeField] private float raycastDistance = 3f;
     [SerializeField] private LayerMask interactableLayer;
 
+    [Header("Interacción (Agarrar)")]
+    [SerializeField] private Transform pickupHolder; 
+    [SerializeField] private KeyCode interactionKey = KeyCode.E; 
+
+    private GameObject heldObject; 
+    private Rigidbody heldObjectRb; 
+
     [Header("UI de Interacción")]
-    [SerializeField] private GameObject itemInfoPanel;     
-    [SerializeField] private TextMeshProUGUI itemNameText; 
+    [SerializeField] private GameObject itemInfoPanel;
+    [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemPriceText;
 
     private float xRotation = 0f;
@@ -72,36 +79,32 @@ public class PlayerController : MonoBehaviour
             currentSpeed = walkSpeed;
         }
 
-        HandleRaycast();
+        HandleRaycastUI(); 
+        HandleInteractionInput(); 
     }
 
-    void FixedUpdate()
+    private void HandleRaycastUI()
     {
-        Vector3 targetVelocity = moveInput * currentSpeed;
-        targetVelocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = targetVelocity;
-    }
+        if (heldObject != null)
+        {
+            itemInfoPanel.SetActive(false);
+            return;
+        }
 
-    private void HandleRaycast()
-    {
         Ray ray = new Ray(playerCamera.position, playerCamera.forward);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, raycastDistance, interactableLayer))
         {
-           
             ItemInstance item = hit.collider.GetComponent<ItemInstance>();
-
             if (item != null)
             {
                 itemInfoPanel.SetActive(true);
-
                 itemNameText.text = item.data.itemName;
                 itemPriceText.text = $"${item.data.price} - {item.data.itemCategory}";
             }
             else
             {
-               
                 itemInfoPanel.SetActive(false);
             }
         }
@@ -109,5 +112,64 @@ public class PlayerController : MonoBehaviour
         {
             itemInfoPanel.SetActive(false);
         }
+    }
+
+    private void HandleInteractionInput()
+    {
+        if (Input.GetKeyDown(interactionKey))
+        {
+            if (heldObject != null)
+            {
+                DropObject();
+            }
+            else
+            {
+                Ray ray = new Ray(playerCamera.position, playerCamera.forward);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, raycastDistance, interactableLayer))
+                {
+                    ItemInstance item = hit.collider.GetComponent<ItemInstance>();
+                    if (item != null)
+                    {
+                        PickUpObject(item.gameObject);
+                    }
+                }
+            }
+        }
+    }
+
+    private void PickUpObject(GameObject item)
+    {
+        heldObject = item;
+        heldObjectRb = item.GetComponent<Rigidbody>();
+
+        
+        heldObjectRb.isKinematic = true;
+
+        heldObject.transform.SetParent(pickupHolder);
+
+        heldObject.transform.localPosition = Vector3.zero;
+        heldObject.transform.localRotation = Quaternion.identity; 
+
+        heldObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+    }
+
+    private void DropObject()
+    {
+        heldObjectRb.isKinematic = false;
+
+        heldObject.transform.SetParent(null);
+
+        heldObject.layer = LayerMask.NameToLayer("Interactable");
+
+        heldObject = null;
+        heldObjectRb = null;
+    }
+
+    void FixedUpdate()
+    {
+        Vector3 targetVelocity = moveInput * currentSpeed;
+        targetVelocity.y = rb.linearVelocity.y; 
+        rb.linearVelocity = targetVelocity;
     }
 }
