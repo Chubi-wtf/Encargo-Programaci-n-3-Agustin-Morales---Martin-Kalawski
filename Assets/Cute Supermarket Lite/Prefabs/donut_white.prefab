@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3682584567690083637}
   - component: {fileID: 2102529737375766590}
   - component: {fileID: -7474094731202203589}
+  - component: {fileID: 3303063719701441020}
   m_Layer: 0
   m_Name: donut_white
   m_TagString: Untagged
@@ -59,6 +60,11 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -80,6 +86,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -106,3 +113,16 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 630001324295082271, guid: 1a1a2458a6cc02d47bd5d76f835c8ea7, type: 3}
+--- !u!114 &3303063719701441020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5440950435437339773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe0591986984e04f88d4d185baca10d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemInstance
+  data: {fileID: 11400000, guid: cca158ed8b6ad774cb308a799ad15dba, type: 2}
