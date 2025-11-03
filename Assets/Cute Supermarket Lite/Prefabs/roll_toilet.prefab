@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1724934495925693929}
   - component: {fileID: -3377605848412426006}
   - component: {fileID: 6818235963091885696}
+  - component: {fileID: 6735522914850351730}
   m_Layer: 0
   m_Name: roll_toilet
   m_TagString: Untagged
@@ -125,4 +126,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fe0591986984e04f88d4d185baca10d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemInstance
-  data: {fileID: 11400000, guid: 32074cc1c66d6f448a7efbbce8aa5dc6, type: 2}
+  datosDelItem: {fileID: 11400000, guid: 32074cc1c66d6f448a7efbbce8aa5dc6, type: 2}
+--- !u!54 &6735522914850351730
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2580249621097652999}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

@@ -136,7 +136,11 @@ public class PlayerController : MonoBehaviour
             {
                 panelInfoItem.SetActive(true);
                 textoNombreItem.text = itemInstance.datosDelItem.itemName;
-                textoPrecioItem.text = $"${itemInstance.datosDelItem.price} - {itemInstance.datosDelItem.itemCategory}";
+
+                // --- LÍNEA MODIFICADA ---
+                // Ahora usamos el 'precioDeEsteItem' del item
+                textoPrecioItem.text = $"${itemInstance.precioDeEsteItem} - {itemInstance.datosDelItem.itemCategory}";
+                // --- FIN DE LÍNEA MODIFICADA ---
             }
             else
             {
@@ -148,7 +152,6 @@ public class PlayerController : MonoBehaviour
             panelInfoItem.SetActive(false);
         }
     }
-
     private void ManejarInputInteraccion()
     {
         if (Input.GetKeyDown(teclaInteractuar))

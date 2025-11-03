@@ -5,14 +5,33 @@ public class ItemInstance : MonoBehaviour
 {
     #region Variables
     public ItemData datosDelItem;
+    public float precioDeEsteItem { get; private set; }
+
     private Rigidbody miRigidbody;
+    private Collider[] todosMisColliders; 
+    private GestorDeItems gestorDeItems;
     private const string tagCestaCarrito = "CartBasket";
     #endregion
 
     #region Eventos de Unity
-    void Awake()
+    void Start()
     {
         miRigidbody = GetComponent<Rigidbody>();
+
+        
+        todosMisColliders = GetComponentsInChildren<Collider>();
+
+        gestorDeItems = FindObjectOfType<GestorDeItems>();
+
+        if (gestorDeItems != null)
+        {
+            precioDeEsteItem = gestorDeItems.GenerarPrecioParaItem(datosDelItem);
+        }
+        else
+        {
+            Debug.LogError("ItemInstance no pudo encontrar el GestorDeItems en la escena!");
+            precioDeEsteItem = 1.0f;
+        }
     }
 
     void OnTriggerEnter(Collider otroCollider)
@@ -20,11 +39,18 @@ public class ItemInstance : MonoBehaviour
         if (otroCollider.CompareTag(tagCestaCarrito))
         {
             miRigidbody.isKinematic = true;
+            SetCollidersEnabled(false); 
 
             Rigidbody rbDelCarrito = otroCollider.GetComponentInParent<Rigidbody>();
             if (rbDelCarrito != null)
             {
                 transform.SetParent(rbDelCarrito.transform);
+            }
+
+            GestorDeCarrito carrito = rbDelCarrito.GetComponent<GestorDeCarrito>();
+            if (carrito != null)
+            {
+                carrito.AnadirItemAlTotal(this);
             }
         }
     }
@@ -34,7 +60,27 @@ public class ItemInstance : MonoBehaviour
         if (otroCollider.CompareTag(tagCestaCarrito))
         {
             miRigidbody.isKinematic = false;
+            SetCollidersEnabled(true); 
             transform.SetParent(null);
+
+            GestorDeCarrito carrito = otroCollider.GetComponentInParent<GestorDeCarrito>();
+            if (carrito != null)
+            {
+                carrito.QuitarItemDelTotal(this);
+            }
+        }
+    }
+    #endregion
+
+    #region Funciones Helper (NUEVO)
+    private void SetCollidersEnabled(bool estaActivo)
+    {
+        foreach (Collider col in todosMisColliders)
+        {
+            if (!col.isTrigger)
+            {
+                col.enabled = estaActivo;
+            }
         }
     }
     #endregion
