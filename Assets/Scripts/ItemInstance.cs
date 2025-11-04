@@ -19,7 +19,6 @@ public class ItemInstance : MonoBehaviour
         miRigidbody = GetComponent<Rigidbody>();
         todosMisColliders = GetComponentsInChildren<Collider>();
 
-        // --- LÍNEA CORREGIDA ---
         gestorDeItems = FindFirstObjectByType<GestorDeItems>();
 
         if (gestorDeItems != null)
@@ -46,7 +45,6 @@ public class ItemInstance : MonoBehaviour
                 transform.SetParent(rbDelCarrito.transform);
             }
 
-            // Esta línea dará error hasta que arregles el Paso 1
             GestorDeCarrito carrito = rbDelCarrito.GetComponent<GestorDeCarrito>();
             if (carrito != null)
             {
@@ -63,7 +61,7 @@ public class ItemInstance : MonoBehaviour
             SetCollidersEnabled(true);
             transform.SetParent(null);
 
-            // Esta línea dará error hasta que arregles el Paso 1
+            
             GestorDeCarrito carrito = otroCollider.GetComponentInParent<GestorDeCarrito>();
             if (carrito != null)
             {
