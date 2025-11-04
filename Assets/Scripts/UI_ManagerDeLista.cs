@@ -9,7 +9,7 @@ public class UI_ManagerDeLista : MonoBehaviour
     [SerializeField] private GestorDeListas gestorDeListas;
 
     [Header("Elementos UI")]
-    [SerializeField] private GameObject panelPrincipal;
+    [SerializeField] private GameObject panelPrincipal; // Este ahora es "Contenido_Visual"
     [SerializeField] private TextMeshProUGUI textoDineroQueTengo;
     [SerializeField] private TextMeshProUGUI textoTotalDeLaLista;
     [SerializeField] private TextMeshProUGUI textoItemsEnLista;
@@ -21,13 +21,11 @@ public class UI_ManagerDeLista : MonoBehaviour
     #endregion
 
     #region Eventos de Unity
-
-
     void Start()
     {
         if (gestorDeListas == null)
         {
-            gestorDeListas = FindObjectOfType<GestorDeListas>();
+            gestorDeListas = FindFirstObjectByType<GestorDeListas>();
         }
 
         if (botonCerrar != null)
@@ -37,15 +35,15 @@ public class UI_ManagerDeLista : MonoBehaviour
 
         gestorDeListas.GenerarNuevaLista();
         ActualizarPanelUI();
-        AbrirPanel();
 
-
+ 
+        CerrarPanel();
 
         GestorDeCarrito.OnItemAgregado += MarcarItemComoEncontrado;
         GestorDeCarrito.OnItemQuitado += DesmarcarItemComoEncontrado;
     }
 
- 
+
     void OnDestroy()
     {
         GestorDeCarrito.OnItemAgregado -= MarcarItemComoEncontrado;
@@ -90,7 +88,6 @@ public class UI_ManagerDeLista : MonoBehaviour
         panelPrincipal.SetActive(true);
         DesbloquearCursor();
         Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
     }
 
     public void CerrarPanel()
@@ -98,11 +95,10 @@ public class UI_ManagerDeLista : MonoBehaviour
         panelPrincipal.SetActive(false);
         BloquearCursor();
         Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.Locked;
     }
     #endregion
 
-    #region Lógica de Tachar Items (NUEVO)
+    #region Lógica de Tachar Items
 
     private void MarcarItemComoEncontrado(ItemData itemData)
     {
@@ -111,10 +107,9 @@ public class UI_ManagerDeLista : MonoBehaviour
             if (!itemEnLista.encontrado && itemEnLista.datosDelItem == itemData)
             {
                 itemEnLista.encontrado = true;
-                break; 
+                break;
             }
         }
-
         ActualizarPanelUI();
     }
 
@@ -126,10 +121,9 @@ public class UI_ManagerDeLista : MonoBehaviour
             if (itemEnLista.encontrado && itemEnLista.datosDelItem == itemData)
             {
                 itemEnLista.encontrado = false;
-                break; 
+                break;
             }
         }
-
         ActualizarPanelUI();
     }
     #endregion

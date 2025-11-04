@@ -64,9 +64,11 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    
+
     void Start()
     {
-     
+      
         velocidadActual = velocidadCaminar;
 
         if (panelInfoItem != null)

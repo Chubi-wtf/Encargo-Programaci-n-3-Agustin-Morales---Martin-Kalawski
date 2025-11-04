@@ -3,28 +3,33 @@ using TMPro;
 
 public class UI_ItemEnLista : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI textoNumero;
     [SerializeField] private TextMeshProUGUI textoNombre;
     [SerializeField] private TextMeshProUGUI textoPrecio;
-    [SerializeField] private TextMeshProUGUI textoTachado; 
+
+    [Header("Configuración de Tachado")]
+    [SerializeField] private Color colorNormal = Color.white;
+    [SerializeField] private Color colorTachado = Color.red;
 
     public void ActualizarDatos(ItemEnLista item, int numero)
     {
-        if (textoNumero != null)
-            textoNumero.text = numero.ToString();
+        string nombreStr = item.datosDelItem.itemName;
+        string precioStr = $"${item.precioGenerado}";
 
-        if (textoNombre != null)
-            textoNombre.text = item.datosDelItem.itemName;
-
-        if (textoPrecio != null)
-            textoPrecio.text = $"${item.precioGenerado}";
-
-        
-        if (textoTachado != null)
+        if (item.encontrado)
         {
-            
-            textoTachado.text = item.encontrado ? "---PALABRA DE PRUEBA---" : "";
+            if (textoNombre != null) textoNombre.color = colorTachado;
+            if (textoPrecio != null) textoPrecio.color = colorTachado;
+
+            if (textoNombre != null) textoNombre.text = $"<s>{nombreStr}</s>";
+            if (textoPrecio != null) textoPrecio.text = $"<s>{precioStr}</s>";
         }
-        
+        else
+        {
+            if (textoNombre != null) textoNombre.color = colorNormal;
+            if (textoPrecio != null) textoPrecio.color = colorNormal;
+
+            if (textoNombre != null) textoNombre.text = nombreStr;
+            if (textoPrecio != null) textoPrecio.text = precioStr;
+        }
     }
 }
