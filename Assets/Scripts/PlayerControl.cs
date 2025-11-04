@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
@@ -44,6 +45,9 @@ public class PlayerController : MonoBehaviour
     private GameObject objetoAgarrado;
     private Rigidbody rbObjetoAgarrado;
     private Collider colliderObjetoAgarrado;
+
+    private bool isPaused = false;
+    [SerializeField] private GameObject pauseMenuUI;
 
     private Rigidbody rbCarritoAgarrado = null;
     private Collider colliderCarritoAgarrado = null;
@@ -102,6 +106,11 @@ public class PlayerController : MonoBehaviour
 
         ManejarRaycastUI();
         ManejarInputInteraccion();
+
+        if (Input.GetKey(KeyCode.P))
+        {
+            pauseOnOff();
+        }
     }
 
     void FixedUpdate()
@@ -185,6 +194,25 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void pauseOnOff()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f;
+            if (pauseMenuUI != null)
+                pauseMenuUI.SetActive(true);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            if (pauseMenuUI != null)
+                pauseMenuUI.SetActive(false);
+        }
+
     }
     #endregion
 
