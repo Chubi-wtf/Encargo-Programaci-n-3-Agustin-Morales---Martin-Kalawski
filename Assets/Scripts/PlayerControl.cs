@@ -63,10 +63,10 @@ public class PlayerController : MonoBehaviour
         miRigidbody.freezeRotation = true;
     }
 
+
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+     
         velocidadActual = velocidadCaminar;
 
         if (panelInfoItem != null)
@@ -74,7 +74,6 @@ public class PlayerController : MonoBehaviour
             panelInfoItem.SetActive(false);
         }
     }
-
     void Update()
     {
         float mouseInputX = Input.GetAxis("Mouse X") * sensibilidadMouse * Time.deltaTime;
@@ -137,10 +136,9 @@ public class PlayerController : MonoBehaviour
                 panelInfoItem.SetActive(true);
                 textoNombreItem.text = itemInstance.datosDelItem.itemName;
 
-                // --- LÍNEA MODIFICADA ---
-                // Ahora usamos el 'precioDeEsteItem' del item
+             
                 textoPrecioItem.text = $"${itemInstance.precioDeEsteItem} - {itemInstance.datosDelItem.itemCategory}";
-                // --- FIN DE LÍNEA MODIFICADA ---
+                
             }
             else
             {

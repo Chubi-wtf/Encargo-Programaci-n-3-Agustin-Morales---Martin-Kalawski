@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 public class GestorDeCarrito : MonoBehaviour
 {
+   
+    public static event System.Action<ItemData> OnItemAgregado;
+    public static event System.Action<ItemData> OnItemQuitado;
+
     [Header("Estado del Carrito")]
     public float totalGastado = 0f;
     public List<ItemInstance> itemsDentroDelCarrito;
@@ -19,6 +23,9 @@ public class GestorDeCarrito : MonoBehaviour
             itemsDentroDelCarrito.Add(item);
             RecalcularTotal();
             Debug.Log($"Añadido: {item.datosDelItem.itemName} (${item.precioDeEsteItem}). Nuevo Total: ${totalGastado}");
+
+          
+            OnItemAgregado?.Invoke(item.datosDelItem);
         }
     }
 
@@ -29,6 +36,9 @@ public class GestorDeCarrito : MonoBehaviour
             itemsDentroDelCarrito.Remove(item);
             RecalcularTotal();
             Debug.Log($"Quitado: {item.datosDelItem.itemName} (${item.precioDeEsteItem}). Nuevo Total: ${totalGastado}");
+
+           
+            OnItemQuitado?.Invoke(item.datosDelItem);
         }
     }
 
@@ -39,7 +49,6 @@ public class GestorDeCarrito : MonoBehaviour
         {
             totalGastado += item.precioDeEsteItem;
         }
-
         totalGastado = Mathf.Round(totalGastado * 100f) / 100f;
     }
 }
