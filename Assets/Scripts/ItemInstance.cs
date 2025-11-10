@@ -27,7 +27,6 @@ public class ItemInstance : MonoBehaviour
         }
         else
         {
-            Debug.LogError("ItemInstance no pudo encontrar el GestorDeItems en la escena!");
             precioDeEsteItem = 1.0f;
         }
     }
@@ -61,7 +60,6 @@ public class ItemInstance : MonoBehaviour
             SetCollidersEnabled(true);
             transform.SetParent(null);
 
-            
             GestorDeCarrito carrito = otroCollider.GetComponentInParent<GestorDeCarrito>();
             if (carrito != null)
             {

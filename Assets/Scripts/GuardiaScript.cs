@@ -3,11 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class GuardiaScript : MonoBehaviour
 {
-    private Animator animator;
+    private Animator anim;
 
     void Awake()
     {
-        animator = GetComponent<Animator>();
+        anim = GetComponent<Animator>();
     }
 
     void Start()

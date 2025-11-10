@@ -1,69 +1,82 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public class GestorDeListas : MonoBehaviour
 {
-    #region Variables
-    [Header("Conexión")]
+    #region Variables Públicas
+    public List<ItemEnLista> listaDeCompraActual = new List<ItemEnLista>();
+    public int ItemsEncontrados { get; set; } = 0;
+    public float miDinero = 27.28f;
+    public float totalLista { get; set; } = 0f;
+
+    [Header("Configuración de Generación")]
     [SerializeField] private GestorDeItems gestorDeItems;
-
-    [Header("Rangos de Generación")]
-    [SerializeField] private Vector2Int rangoItems = new Vector2Int(5, 23);
-
-    [Header("Lista Generada (Resultados)")]
-    public List<ItemEnLista> listaDeCompraActual;
-    public float miDinero { get; private set; }
-    public float totalLista { get; private set; }
-    public int cantidadItems { get; private set; }
+    [SerializeField] private int minItems = 5;
+    [SerializeField] private int maxItems = 10;
     #endregion
 
-    #region Eventos de Unity
-    void Start()
+    #region Ciclo de Vida
+    void Awake()
     {
         if (gestorDeItems == null)
         {
-            Debug.LogError("¡GestorDeListas no tiene un GestorDeItems asignado!");
-            return;
+            gestorDeItems = Object.FindAnyObjectByType<GestorDeItems>();
         }
+    }
 
-       
+    void Start()
+    {
+        GenerarNuevaLista();
     }
     #endregion
 
-    #region Lógica de la Lista
+    #region Lógica de Lista
     public void GenerarNuevaLista()
     {
-        cantidadItems = Random.Range(rangoItems.x, rangoItems.y + 1);
-
-        
-        if (listaDeCompraActual == null)
-            listaDeCompraActual = new List<ItemEnLista>();
-        else
-            listaDeCompraActual.Clear();
-
-        totalLista = 0;
-
-        for (int i = 0; i < cantidadItems; i++)
+        if (gestorDeItems == null || gestorDeItems.TodosLosItemsDisponibles.Count == 0)
         {
-            int indiceRandom = Random.Range(0, gestorDeItems.todosLosItemsDisponibles.Count);
-            ItemData itemElegido = gestorDeItems.todosLosItemsDisponibles[indiceRandom];
-
-            float precioGenerado = gestorDeItems.GenerarPrecioParaItem(itemElegido);
-
-            ItemEnLista nuevoItem = new ItemEnLista(itemElegido, precioGenerado);
-            listaDeCompraActual.Add(nuevoItem);
-
-            totalLista += precioGenerado;
+            listaDeCompraActual.Clear();
+            totalLista = 0f;
+            return;
         }
 
-        totalLista = Mathf.Round(totalLista * 100f) / 100f;
+        listaDeCompraActual.Clear();
+        ItemsEncontrados = 0;
+        float totalGastoRequerido = 0f;
 
-       
-        float extra = (Random.Range(0, 2) == 0) ? 10f : 22f; 
-        miDinero = totalLista + extra;
-        miDinero = Mathf.Round(miDinero * 100f) / 100f; 
+        HashSet<ItemData> itemsUnicosSeleccionados = new HashSet<ItemData>();
+        int maxItemsDisponibles = gestorDeItems.TodosLosItemsDisponibles.Count;
+        int cantidadTotal = Mathf.Min(maxItems, maxItemsDisponibles);
+        int cantidadItemsAGenerar = Random.Range(minItems, cantidadTotal + 1);
 
-        Debug.Log($"LISTA GENERADA: {cantidadItems} items, con un costo de ${totalLista}. Tienes ${miDinero}.");
+        while (itemsUnicosSeleccionados.Count < cantidadItemsAGenerar)
+        {
+            int indiceAleatorio = Random.Range(0, maxItemsDisponibles);
+            ItemData datosAleatorios = gestorDeItems.TodosLosItemsDisponibles[indiceAleatorio];
+
+            if (itemsUnicosSeleccionados.Add(datosAleatorios))
+            {
+                float precioGenerado = Random.Range(1.00f, 10.00f);
+                ItemEnLista nuevoItem = new ItemEnLista(datosAleatorios, precioGenerado);
+                listaDeCompraActual.Add(nuevoItem);
+
+                totalGastoRequerido += precioGenerado;
+            }
+        }
+
+        totalLista = Mathf.Round(totalGastoRequerido * 100f) / 100f;
+
+        float margenSeguridad = Random.Range(5.00f, 10.00f);
+
+        miDinero = totalLista + margenSeguridad;
+        miDinero = Mathf.Round(miDinero * 100f) / 100f;
+
+        UI_ManagerDeLista uiManager = Object.FindAnyObjectByType<UI_ManagerDeLista>();
+        if (uiManager != null)
+        {
+            uiManager.ActualizarPanelUI();
+        }
     }
     #endregion
 }

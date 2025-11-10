@@ -4,13 +4,12 @@ using UnityEngine.AI;
 
 public class MovimientoNpcPorSupermercado : MonoBehaviour
 {
+    #region Variables
     [Header("Waypoints")]
     [SerializeField] private Transform[] waypoints;
 
     [Header("Movimiento")]
-
     [SerializeField] private float agentSpeed = 3.5f;
-
     [SerializeField] private float waitTime = 1f;
     [SerializeField] private float nextWaypointThreshold = 0.3f;
     [SerializeField] private bool loop = true;
@@ -23,13 +22,14 @@ public class MovimientoNpcPorSupermercado : MonoBehaviour
     private int currentIndex = 0;
     private bool waiting = false;
     private Coroutine waitCoroutine;
+    #endregion
 
+    #region Ciclo de Vida
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         if (agent == null)
         {
-            Debug.LogWarning($"{nameof(MovimientoNpcPorSupermercado)} requiere un NavMeshAgent en el mismo GameObject.");
             enabled = false;
             return;
         }
@@ -39,7 +39,6 @@ public class MovimientoNpcPorSupermercado : MonoBehaviour
 
         if (waypoints == null || waypoints.Length == 0)
         {
-            Debug.LogWarning($"{nameof(MovimientoNpcPorSupermercado)}: no hay waypoints asignados.");
             enabled = false;
             return;
         }
@@ -74,8 +73,10 @@ public class MovimientoNpcPorSupermercado : MonoBehaviour
             waitCoroutine = StartCoroutine(WaitAtWaypoint());
         }
     }
+    #endregion
 
-    private IEnumerator WaitAtWaypoint()
+    #region Lógica de Waypoints
+    IEnumerator WaitAtWaypoint()
     {
         waiting = true;
         yield return new WaitForSeconds(waitTime);
@@ -118,8 +119,9 @@ public class MovimientoNpcPorSupermercado : MonoBehaviour
             agent.speed = newSpeed;
         }
     }
+    #endregion
 
-
+    #region Gizmos
     void OnDrawGizmos()
     {
         if (waypoints == null || waypoints.Length == 0) return;
@@ -143,4 +145,5 @@ public class MovimientoNpcPorSupermercado : MonoBehaviour
             }
         }
     }
+    #endregion
 }

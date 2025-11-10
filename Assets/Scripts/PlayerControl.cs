@@ -3,7 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
-public class PlayerController : MonoBehaviour
+public class PlayerControl : MonoBehaviour
 {
     #region Variables del Inspector
     [Header("Componentes")]
@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float sensibilidadMouse = 100f;
 
     [Header("Interacción (Raycast)")]
-    [SerializeField] private float distanciaRaycast = 3f;
+    [SerializeField] private float distanciaRaycast = 6f;
     [SerializeField] private LayerMask capaInteractuable;
     [SerializeField] private LayerMask capaPiso;
 
@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     [Header("Interacción (Carrito)")]
     [SerializeField] private string tagDelCarrito = "Carrito";
     [SerializeField] private float suavidadSeguirCarrito = 15f;
-    [SerializeField] private float alturaFlotarCarrito = 0.2f;
+    [SerializeField] private float alturaFlotarCarrito = 0.0001f;
 
     [Header("UI de Interacción")]
     [SerializeField] private GameObject panelInfoItem;
@@ -53,6 +53,8 @@ public class PlayerController : MonoBehaviour
     private float rotacionX = 0f;
     private float rotacionY = 0f;
     private Vector3 inputMovimiento;
+
+    private DialogManager dialogManager;
     #endregion
 
     #region Eventos de Unity
@@ -61,14 +63,12 @@ public class PlayerController : MonoBehaviour
         miRigidbody = GetComponent<Rigidbody>();
         miCollider = GetComponent<Collider>();
         miRigidbody.freezeRotation = true;
+
+        dialogManager = Object.FindAnyObjectByType<DialogManager>();
     }
-
-
-    
 
     void Start()
     {
-      
         velocidadActual = velocidadCaminar;
 
         if (panelInfoItem != null)
@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviour
             panelInfoItem.SetActive(false);
         }
     }
+
     void Update()
     {
         float mouseInputX = Input.GetAxis("Mouse X") * sensibilidadMouse * Time.deltaTime;
@@ -119,9 +120,15 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Lógica de Interacción y UI
-    private void ManejarRaycastUI()
+    void ManejarRaycastUI()
     {
         if (objetoAgarrado != null || rbCarritoAgarrado != null)
+        {
+            panelInfoItem.SetActive(false);
+            return;
+        }
+
+        if (dialogManager != null && dialogManager.IsDialogueActive)
         {
             panelInfoItem.SetActive(false);
             return;
@@ -137,10 +144,7 @@ public class PlayerController : MonoBehaviour
             {
                 panelInfoItem.SetActive(true);
                 textoNombreItem.text = itemInstance.datosDelItem.itemName;
-
-             
-                textoPrecioItem.text = $"${itemInstance.precioDeEsteItem} - {itemInstance.datosDelItem.itemCategory}";
-                
+                textoPrecioItem.text = $"${itemInstance.precioDeEsteItem:F2} - {itemInstance.datosDelItem.itemCategory}";
             }
             else
             {
@@ -152,40 +156,72 @@ public class PlayerController : MonoBehaviour
             panelInfoItem.SetActive(false);
         }
     }
+
     private void ManejarInputInteraccion()
     {
-        if (Input.GetKeyDown(teclaInteractuar))
+        if (!Input.GetKeyDown(teclaInteractuar))
         {
-            if (rbCarritoAgarrado != null)
+            return;
+        }
+
+        Ray rayo = new Ray(camaraDelPlayer.position, camaraDelPlayer.forward);
+        RaycastHit hitInfo;
+
+        if (Physics.Raycast(rayo, out hitInfo, distanciaRaycast, capaInteractuable))
+        {
+            NPC_Cajero cajero = hitInfo.collider.GetComponent<NPC_Cajero>();
+            NPC_Jefe jefe = hitInfo.collider.GetComponent<NPC_Jefe>();
+            NPC_Guardia guardia = hitInfo.collider.GetComponent<NPC_Guardia>();
+            NPC_Cliente cliente = hitInfo.collider.GetComponent<NPC_Cliente>();
+
+            if (cajero != null || guardia != null || cliente != null)
             {
-                SoltarCarrito();
+                if (dialogManager.IsDialogueActive)
+                {
+                    dialogManager.CloseDialogue();
+                }
+                else
+                {
+                    if (jefe != null) jefe.TriggerDialoguePublic();
+                    else if (guardia != null) guardia.TriggerDialoguePublic();
+                    else if (cliente != null) cliente.TriggerDialoguePublic();
+                    else if (cajero != null) cajero.TriggerDialoguePublic();
+                }
                 return;
             }
+        }
 
-            if (objetoAgarrado != null)
+        if (dialogManager != null && dialogManager.IsDialogueActive)
+        {
+            return;
+        }
+
+        if (rbCarritoAgarrado != null)
+        {
+            SoltarCarrito();
+            return;
+        }
+
+        if (objetoAgarrado != null)
+        {
+            SoltarObjeto();
+            return;
+        }
+
+        if (Physics.Raycast(rayo, out hitInfo, distanciaRaycast, capaInteractuable))
+        {
+            ItemInstance itemInstance = hitInfo.collider.GetComponent<ItemInstance>();
+            if (itemInstance != null)
             {
-                SoltarObjeto();
-                return;
+                AgarrarObjeto(itemInstance.gameObject);
             }
-
-            Ray rayo = new Ray(camaraDelPlayer.position, camaraDelPlayer.forward);
-            RaycastHit hitInfo;
-
-            if (Physics.Raycast(rayo, out hitInfo, distanciaRaycast, capaInteractuable))
+            else if (hitInfo.collider.CompareTag(tagDelCarrito))
             {
-                ItemInstance itemInstance = hitInfo.collider.GetComponent<ItemInstance>();
-                if (itemInstance != null)
-                {
-                    AgarrarObjeto(itemInstance.gameObject);
-                }
-                else if (hitInfo.collider.CompareTag(tagDelCarrito))
-                {
-                    AgarrarCarrito(hitInfo.collider.gameObject);
-                }
-                else if (hitInfo.collider.transform.parent != null && hitInfo.collider.transform.parent.CompareTag(tagDelCarrito))
-                {
-                    AgarrarCarrito(hitInfo.collider.transform.parent.gameObject);
-                }
+                AgarrarCarrito(hitInfo.collider.gameObject);
+            }
+            else if (hitInfo.collider.transform.parent != null && hitInfo.collider.transform.parent.CompareTag(tagDelCarrito))
+            {
+                AgarrarCarrito(hitInfo.collider.transform.parent.gameObject);
             }
         }
     }

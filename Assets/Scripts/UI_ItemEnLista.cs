@@ -3,17 +3,20 @@ using TMPro;
 
 public class UI_ItemEnLista : MonoBehaviour
 {
+    #region Variables
     [SerializeField] private TextMeshProUGUI textoNombre;
     [SerializeField] private TextMeshProUGUI textoPrecio;
 
     [Header("Configuración de Tachado")]
     [SerializeField] private Color colorNormal = Color.white;
     [SerializeField] private Color colorTachado = Color.red;
+    #endregion
 
+    #region Lógica de UI
     public void ActualizarDatos(ItemEnLista item, int numero)
     {
         string nombreStr = item.datosDelItem.itemName;
-        string precioStr = $"${item.precioGenerado}";
+        string precioStr = $"${item.precioGenerado:F2}";
 
         if (item.encontrado)
         {
@@ -32,4 +35,5 @@ public class UI_ItemEnLista : MonoBehaviour
             if (textoPrecio != null) textoPrecio.text = precioStr;
         }
     }
+    #endregion
 }
